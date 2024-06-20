@@ -2,8 +2,12 @@ const express = require("express");
 
 const router = express.Router();
 
-router.get("/", (req, res) => {
-    return "Quandz";
-});
+const userApi = require("./userApi");
+const postApi = require("./postApi");
+const commentApi = require("./commentApi");
+
+router.use("/user", userApi);
+router.use("/post", postApi);
+router.use("/comment", commentApi);
 
 module.exports = router;

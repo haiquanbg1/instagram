@@ -7,7 +7,11 @@ module.exports = {
     database: process.env.db_name,
     host: process.env.db_host,
     port: process.env.db_port,
-    dialect: "mysql"
+    dialect: "mysql",
+    seederStorage: "json",
+    migrationStorage: "json",
+    migrationStoragePath: "sequelizeMigrate.json",
+    seederStoragePath: "sequelizeSeed.json",
   },
   test: {
     username: "root",

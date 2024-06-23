@@ -24,6 +24,9 @@ module.exports = {
       password: {
         type: Sequelize.STRING
       },
+      birthday: {
+        type: Sequelize.DATE
+      },
       role: {
         type: Sequelize.STRING,
         defaultValue: 'customer',

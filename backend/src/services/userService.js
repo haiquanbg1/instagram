@@ -26,9 +26,19 @@ const drop = async (id) => {
     });
 }
 
+const update = async (id, updateClause) => {
+    return await User.update(
+        updateClause, {
+        where: {
+            id: id
+        }
+    })
+}
+
 module.exports = {
     findAll,
     findOne,
     create,
-    drop
+    drop,
+    update
 }

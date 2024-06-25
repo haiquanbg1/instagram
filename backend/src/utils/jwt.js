@@ -32,7 +32,7 @@ const generateToken = async (payload, type) => {
     }
 };
 
-const decodeToken = async (token, secretKey) => {
+const decodeToken = async (token, secretKey = process.env.REFRESH_TOKEN_SECRET) => {
     try {
         return await verify(token, secretKey, {
             ignoreExpiration: true,

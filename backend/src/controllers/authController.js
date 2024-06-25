@@ -85,7 +85,42 @@ const login = async (req, res) => {
     })
 }
 
+const refreshToken = async (req, res) => {
+    const refreshToken = req.body.refreshToken;
+
+    if (!refreshToken) {
+        return errorResponse(res, 404, "Token not found!");
+    }
+
+    const decoded = await jwt.decodeToken(refreshToken);
+
+    if (!decoded) {
+        return errorResponse(res, 400, "Token invalid!");
+    }
+
+    let user;
+
+    try {
+        user = User.findOne({
+            refreshToken: refreshToken
+        });
+    } catch (error) {
+        return errorResponse(res, 500, "Can't find user");
+    }
+
+    if (!user) {
+        return errorResponse(res, 404, "User not found!");
+    }
+
+    const accessToken = await jwt.generateToken(user.id, "accessToken");
+
+    return successResponse(res, 200, "Refresh token successfully!", {
+        accessToken
+    });
+}
+
 module.exports = {
     register,
-    login
+    login,
+    refreshToken
 }

@@ -43,7 +43,7 @@ const decodeToken = async (token, secretKey = process.env.REFRESH_TOKEN_SECRET) 
     }
 }
 
-const verifyToken = async (token, secretKey) => {
+const verifyToken = async (token, secretKey = process.env.ACCESS_TOKEN_SECRET) => {
     try {
         return await verify(token, secretKey);
     } catch (error) {

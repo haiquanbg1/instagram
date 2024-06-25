@@ -61,8 +61,15 @@ const login = async (req, res) => {
         return errorResponse(res, 404, "Account or password is wrong");
     }
 
-    let accessToken = await jwt.generateToken(user.id, "accessToken");
-    let refreshToken = await jwt.generateToken(Math.floor(Math.random() * 1000), "refreshToken");
+    const accessToken = await jwt.generateToken({
+        user_id: user.id
+    },
+        "accessToken"
+    );
+    let refreshToken = await jwt.generateToken(
+        Math.floor(Math.random() * 1000),
+        "refreshToken"
+    );
 
     if (!user.refreshToken) {
         try {

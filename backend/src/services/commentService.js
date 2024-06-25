@@ -12,10 +12,21 @@ const createByPost = async (insertClause) => {
     return await Comment.create(insertClause);
 }
 
+const update = async (id, updateClause) => {
+    return await Comment.update(
+        updateClause,
+        {
+            where: {
+                id: id
+            }
+        }
+    )
+}
+
 const drop = async (comment_id) => {
-    return await Comment.delete({
+    return await Comment.destroy({
         where: {
-            comment_id: comment_id
+            id: comment_id
         }
     });
 }
@@ -23,5 +34,6 @@ const drop = async (comment_id) => {
 module.exports = {
     findAllByPost,
     createByPost,
-    drop
+    drop,
+    update
 }

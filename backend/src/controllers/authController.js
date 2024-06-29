@@ -1,6 +1,7 @@
 const bcrypt = require("bcryptjs");
 
 const User = require("../services/userService");
+const Email = require("../services/emailService");
 const { successResponse, errorResponse } = require("../utils/response");
 const jwt = require("../utils/jwt");
 
@@ -8,14 +9,16 @@ const register = async (req, res) => {
     let user = req.body;
     const { email, password, userName } = user;
 
-    const checkEmail = await User.findOne({
+    // check email
+    const checkEmailExists = await User.findOne({
         email: email
     });
 
-    if (checkEmail) {
+    if (checkEmailExists) {
         return errorResponse(res, 400, "Email was exists!");
     };
 
+    // check user
     const checkUserName = await User.findOne({
         userName: userName
     });
@@ -24,6 +27,7 @@ const register = async (req, res) => {
         return errorResponse(res, 400, "User name was exists!");
     }
 
+    // hash password
     user.password = bcrypt.hashSync(password, 10);
 
     try {
@@ -126,8 +130,44 @@ const refreshToken = async (req, res) => {
     });
 }
 
+const verifyEmail = async (req, res) => {
+    const { token } = req.query;
+    
+    try {
+        const decoded = await jwt.verifyToken(token);
+        const { email } = decoded.payload;
+        
+        // Cập nhật trạng thái xác thực email trong database (bỏ qua phần này)
+        
+        return successResponse(res, 200, "Email verified successfully", email);
+    } catch (error) {
+        console.log(error);
+        return errorResponse(res, 400, "Invalid or expired token.");
+    }
+}
+
+const sendVerifyEmail = async (req, res) => {
+    const { email } = req.body;
+
+    const token = await jwt.generateToken({
+        email
+    },
+    "accessToken"
+    );
+
+    try {
+        await Email.sendVerificationEmail(email, token);
+        return successResponse(res, 200, "Registration successful. Please check your email to verify your account.");
+    } catch (error) {
+        console.log(error);
+        return errorResponse(res, 500, "Error sending verification email.");
+    }
+}
+
 module.exports = {
     register,
     login,
-    refreshToken
+    refreshToken,
+    verifyEmail,
+    sendVerifyEmail
 }

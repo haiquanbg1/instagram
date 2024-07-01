@@ -1,15 +1,17 @@
 const nodemailer = require('nodemailer');
+const redis = require("../databases/redis");
 
-const sendVerificationEmail = async (userEmail, token) => {
-    const verificationUrl = `http://localhost:8080/verifyEmail?token=${token}`;
+const sendVerificationEmail = async (userEmail, key) => {
+    await redis.set(key, 1);
+    await redis.expire(key, 65);
 
     const mailOptions = {
         from: process.env.EMAIL_USER,
         to: userEmail,
         subject: 'Email Verification',
         html: `<h1>Email Verification</h1>
-               <p>Click the link below to verify your email:</p>
-               <a href="${verificationUrl}">Verify Email</a>`,
+               <p>Authentication code to verify your email:</p>
+               <p>${key}</p>`,
     };
 
     const transporter = nodemailer.createTransport({

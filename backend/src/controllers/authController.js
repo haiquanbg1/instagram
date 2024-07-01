@@ -1,9 +1,11 @@
 const bcrypt = require("bcryptjs");
+const otp = require("otp-generator");
 
 const User = require("../services/userService");
 const Email = require("../services/emailService");
 const { successResponse, errorResponse } = require("../utils/response");
 const jwt = require("../utils/jwt");
+const redis = require("../databases/redis");
 
 const register = async (req, res) => {
     let user = req.body;
@@ -130,33 +132,37 @@ const refreshToken = async (req, res) => {
     });
 }
 
-const verifyEmail = async (req, res) => {
-    const { token } = req.query;
+const verifyKey = async (req, res) => {
+    const { key } = req.query;
     
     try {
-        const decoded = await jwt.verifyToken(token);
-        const { email } = decoded.payload;
+        const checkKey = await redis.get(key);
+
+        if (checkKey) {
+            return successResponse(res, 200, "Email verified successfully!");
+        }
         
-        // Cập nhật trạng thái xác thực email trong database (bỏ qua phần này)
-        
-        return successResponse(res, 200, "Email verified successfully", email);
+        return errorResponse(res, 404, "Invalid key!");
     } catch (error) {
         console.log(error);
         return errorResponse(res, 400, "Invalid or expired token.");
     }
 }
 
-const sendVerifyEmail = async (req, res) => {
+const verifyEmail = async (req, res) => {
     const { email } = req.body;
 
-    const token = await jwt.generateToken({
-        email
-    },
-    "accessToken"
-    );
+    const key = otp.generate(4, {
+        upperCaseAlphabets: false,
+        specialChars: false
+    });
 
     try {
-        await Email.sendVerificationEmail(email, token);
+        await Email.sendVerificationEmail(email, key);
+
+        await redis.set(key, 1);
+        await redis.expire(key, 60);
+
         return successResponse(res, 200, "Registration successful. Please check your email to verify your account.");
     } catch (error) {
         console.log(error);
@@ -168,6 +174,6 @@ module.exports = {
     register,
     login,
     refreshToken,
-    verifyEmail,
-    sendVerifyEmail
+    verifyKey,
+    verifyEmail
 }

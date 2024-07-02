@@ -2,9 +2,6 @@ const nodemailer = require('nodemailer');
 const redis = require("../databases/redis");
 
 const sendVerificationEmail = async (userEmail, key) => {
-    await redis.set(key, 1);
-    await redis.expire(key, 65);
-
     const mailOptions = {
         from: process.env.EMAIL_USER,
         to: userEmail,

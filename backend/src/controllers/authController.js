@@ -133,19 +133,19 @@ const refreshToken = async (req, res) => {
 }
 
 const verifyKey = async (req, res) => {
-    const { key } = req.query;
+    const { email, key } = req.query;
     
     try {
-        const checkKey = await redis.get(key);
+        const expectedKey = await redis.get(email);
 
-        if (checkKey) {
+        if (expectedKey == key) {
             return successResponse(res, 200, "Email verified successfully!");
         }
         
         return errorResponse(res, 404, "Invalid key!");
     } catch (error) {
         console.log(error);
-        return errorResponse(res, 400, "Invalid or expired token.");
+        return errorResponse(res, 500, "Can't get key.");
     }
 }
 
@@ -160,8 +160,12 @@ const verifyEmail = async (req, res) => {
     try {
         await Email.sendVerificationEmail(email, key);
 
-        await redis.set(key, 1);
-        await redis.expire(key, 60);
+        try {
+            await redis.set(email, key);
+            await redis.expire(email, 60);
+        } catch (error) {
+            return errorResponse(res, 500, "Can't store key!");
+        }
 
         return successResponse(res, 200, "Registration successful. Please check your email to verify your account.");
     } catch (error) {

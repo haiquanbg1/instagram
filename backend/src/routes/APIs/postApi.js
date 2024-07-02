@@ -1,13 +1,11 @@
 const express = require("express");
 
 const { isAuth } = require("../../middleware/authMiddleware");
+const { upload } = require("../../middleware/uploadMiddleware");
 const Post = require("../../controllers/postController");
 
 const router = express.Router();
 
-router.get("/", (req, res) => {
-    return "Quandz";
-});
-router.post("/", isAuth, Post.create);
+router.post("/", isAuth, upload.single('image'), Post.create);
 
 module.exports = router;

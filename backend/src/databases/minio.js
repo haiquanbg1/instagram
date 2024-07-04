@@ -2,11 +2,11 @@ const Minio = require('minio');
 
 // Khởi tạo MinIO client
 const minioClient = new Minio.Client({
-  endPoint: 'localhost',
+  endPoint: process.env.minio_endpoint,
   port: 9000,
   useSSL: false,
-  accessKey: 'minioadmin',
-  secretKey: 'minioadmin'
+  accessKey: process.env.minio_accesskey,
+  secretKey: process.env.minio_secretkey
 });
 
 const upload = async (bucketName, objectName, filePath) => {

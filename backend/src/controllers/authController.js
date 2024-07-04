@@ -7,9 +7,8 @@ const { successResponse, errorResponse } = require("../utils/response");
 const jwt = require("../utils/jwt");
 const redis = require("../databases/redis");
 
-const register = async (req, res) => {
-    let user = req.body;
-    const { email, password, userName } = user;
+const checkExists = async (req, res) => {
+    const { email, userName } = req.body;
 
     // check email
     const checkEmailExists = await User.findOne({
@@ -28,6 +27,13 @@ const register = async (req, res) => {
     if (checkUserName) {
         return errorResponse(res, 400, "User name was exists!");
     }
+
+    return successResponse(res, 200, "All accepted!");
+}
+
+const register = async (req, res) => {
+    let user = req.body;
+    const { password } = user;
 
     // hash password
     user.password = bcrypt.hashSync(password, 10);
@@ -179,5 +185,6 @@ module.exports = {
     login,
     refreshToken,
     verifyKey,
-    verifyEmail
+    verifyEmail,
+    checkExists
 }

@@ -9,5 +9,6 @@ router.post("/login", Auth.login);
 router.post("/refreshToken", Auth.refreshToken);
 router.post("/verifyEmail", Auth.verifyEmail);
 router.get("/verifyKey", Auth.verifyKey);
+router.post("/checkExists", Auth.checkExists);
 
 module.exports = router;

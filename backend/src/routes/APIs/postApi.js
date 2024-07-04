@@ -6,6 +6,6 @@ const Post = require("../../controllers/postController");
 
 const router = express.Router();
 
-router.post("/", isAuth, upload.single('image'), Post.create);
+router.post("/", isAuth, upload.array('image', 10), Post.create);
 
 module.exports = router;

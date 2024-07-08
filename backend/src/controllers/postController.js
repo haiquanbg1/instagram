@@ -21,17 +21,23 @@ const create = async (req, res) => {
         for (const file of uploadedFiles) {
             const filePath = file.path;
             const fileName = file.filename;
+            console.log(filePath);
 
             try {
                 await minio.upload(bucketName, fileName, filePath);
             } catch (error) {
                 return errorResponse(res, 500, "Can't upload image.");
             }
+        }
 
-            // delete file in backend
+        // delete file in backend
+        for (const file of uploadedFiles) {
+            const filePath = file.path;
+
             fs.unlinkSync(filePath);
         }
 
+        // update link image
         await Post.update(post.id, {
             path: "http://localhost:57689/browser/" + bucketName
         });
@@ -42,6 +48,17 @@ const create = async (req, res) => {
     }
 }
 
+const findAll = async (req, res) => {
+    try {
+        const posts = await Post.findAll();
+
+        return successResponse(res, 200, "Posts are found!", posts);
+    } catch (error) {
+        return errorResponse(res, 500, "Can't find post!");
+    }
+}
+
 module.exports = {
-    create
+    create,
+    findAll
 }

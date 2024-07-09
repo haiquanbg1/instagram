@@ -39,7 +39,7 @@ const create = async (req, res) => {
 
         // update link image
         await Post.update(post.id, {
-            path: "http://localhost:57689/browser/" + bucketName
+            path: process.env.minio_link + bucketName
         });
 
         return successResponse(res, 201, "Create post successfully!");
@@ -49,8 +49,13 @@ const create = async (req, res) => {
 }
 
 const findAll = async (req, res) => {
+    const { page } = req.query;
+
+    const limit = 5;
+    const offset = page * limit; 
+
     try {
-        const posts = await Post.findAll();
+        const posts = await Post.findAll(limit, offset);
 
         return successResponse(res, 200, "Posts are found!", posts);
     } catch (error) {

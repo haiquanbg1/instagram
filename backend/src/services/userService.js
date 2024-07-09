@@ -1,6 +1,4 @@
-const { where } = require("sequelize");
 const { User } = require("../models/index");
-const { u } = require("../models/user");
 
 const findAll = async (whereClause) => {
     return await User.findAll({

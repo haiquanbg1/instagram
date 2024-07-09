@@ -1,7 +1,12 @@
+const { Op } = require("sequelize");
 const { Post } = require("../models/index");
 
-const findAll = async () => {
-    return await Post.findAll();
+const findAll = async (limit, offset) => {
+    return await Post.findAll({
+        limit,
+        offset,
+        order: [["createdAt", "DESC"]],
+    });
 }
 
 const create = async (insertClause) => {

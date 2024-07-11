@@ -1,4 +1,3 @@
-const { Op } = require("sequelize");
 const { Post } = require("../models/index");
 
 const findAll = async (limit, offset) => {

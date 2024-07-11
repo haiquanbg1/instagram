@@ -13,7 +13,11 @@ const server = http.createServer(app);
 const io = configureSocketIO(server);
 const port = 8080;
 
-app.use(cors());
+app.use(cors({
+    origin: 'http://localhost:3000',
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+}));
 // api routers
 app.use(
     "/api/ver1/",

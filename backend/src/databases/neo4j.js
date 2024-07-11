@@ -4,9 +4,9 @@ let driver;
 
 (async () => {
   // URI examples: 'neo4j://localhost', 'neo4j+s://xxx.databases.neo4j.io'
-  const URI = "neo4j+s://a0df04ea.databases.neo4j.io";
-  const USER = "neo4j";
-  const PASSWORD = "aLgaUdBKYcteDSbF825wbPpnRJnzh9MTzdXddmugYmU";
+  const URI = process.env.neo4j_host;
+  const USER = process.env.neo4j_user;
+  const PASSWORD = process.env.neo4j_password;
 
   try {
     driver = neo4j.driver(URI, neo4j.auth.basic(USER, PASSWORD));

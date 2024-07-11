@@ -151,7 +151,7 @@ const verifyKey = async (req, res) => {
         return errorResponse(res, 404, "Invalid key!");
     } catch (error) {
         console.log(error);
-        return errorResponse(res, 500, "Can't get key.");
+        return errorResponse(res, 500, "Can't verify key.");
     }
 }
 

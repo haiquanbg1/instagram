@@ -6,6 +6,8 @@ const Email = require("../services/emailService");
 const { successResponse, errorResponse } = require("../utils/response");
 const jwt = require("../utils/jwt");
 const redis = require("../databases/redis");
+const kafkaService = require("../services/kafkaService");
+const neo4jService = require("../services/neo4jService");
 
 const checkExists = async (req, res) => {
     const { email, userName } = req.body;
@@ -40,6 +42,15 @@ const register = async (req, res) => {
 
     try {
         await User.create(user);
+
+        // Send Kafka event
+        const event = {
+            type: 'UserCreated',
+            userName: user.userName,
+        };
+        // await kafkaService.sendMessage("user_changes", event);
+
+        await neo4jService.createPerson(user.userName);
 
         return successResponse(res, 201, "Register successfully!", {
             name: user.firstName + " " + user.lastName,

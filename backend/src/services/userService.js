@@ -1,4 +1,6 @@
 const { User } = require("../models/index");
+const {kafkaProducer, kafkaConsumer } = require("../databases/kafka");
+const neo4j = require("../databases/neo4j");
 
 const findAll = async (whereClause) => {
     return await User.findAll({

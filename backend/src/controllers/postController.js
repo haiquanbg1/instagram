@@ -2,7 +2,7 @@ const Post = require("../services/postService");
 const { errorResponse, successResponse } = require("../utils/response");
 const minio = require("../databases/minio.js");
 const fs = require("fs");
-const { log } = require("console");
+const neo4jService = require("../services/neo4jService.js");
 
 const create = async (req, res) => {
     const user_id = req.user.id;
@@ -10,11 +10,15 @@ const create = async (req, res) => {
     const uploadedFiles = req.files;
 
     try {
+        // create to mysql
         const post = await Post.create({
             likes: 0,
             user_id,
             title
         });
+
+        // create to neo4j
+        await neo4jService.create("Post", "post" + post.id);
 
         // create bucket
         const bucketName = "post" + post.id;
@@ -73,7 +77,21 @@ const findAll = async (req, res) => {
     }
 }
 
+const like = async (req, res) => {
+    const userName = req.user.userName;
+    const { postId } = req.body;
+
+    await neo4jService.likePost(userName,"post" + postId)
+    .catch((err) => {
+        console.log(err);
+        return errorResponse(res, 500, "Can't like post!");
+    });
+
+    return successResponse(res, 201, "Like post successfully!");
+}
+
 module.exports = {
     create,
-    findAll
+    findAll,
+    like
 }

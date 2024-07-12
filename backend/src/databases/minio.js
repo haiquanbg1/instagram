@@ -28,31 +28,37 @@ const upload = async (bucketName, objectName, filePath) => {
 }
 
 const listObjectsAndUrls = (bucketName) => {
-    return new Promise((resolve, reject) => {
-    const images = [];
-    try {
-        const stream = minioClient.listObjectsV2(bucketName, '', true);
-  
-        stream.on('data', obj => {
-            // Tạo URL tĩnh
-            const url = `${minioClient.protocol}//${minioClient.host}:${minioClient.port}/${bucketName}/${obj.name}`;
-            images.push(url);
-            // console.log(`File: ${obj.name}, URL: ${url}`);
-        });
-  
-        stream.on('error', err => {
-            console.error(err);
-            reject(err);
-        });
+    return new Promise(async (resolve, reject) => {
+        const images = [];
 
-        stream.on('end', () => {
-            resolve(images);
-        })
-    } catch (error) {
-        console.error('Error in listing objects: ', error);
-        reject(error);
-    }
-});
+        const checkBucket = await minioClient.bucketExists(bucketName);
+        if (!checkBucket) {
+            return resolve(images);
+        }
+
+        try {
+            const stream = minioClient.listObjectsV2(bucketName, '', true);
+    
+            stream.on('data', obj => {
+                // Tạo URL tĩnh
+                const url = `${minioClient.protocol}//${minioClient.host}:${minioClient.port}/${bucketName}/${obj.name}`;
+                images.push(url);
+                // console.log(`File: ${obj.name}, URL: ${url}`);
+            });
+    
+            stream.on('error', err => {
+                console.error(err);
+                reject(err);
+            });
+
+            stream.on('end', () => {
+                resolve(images);
+            })
+        } catch (error) {
+            console.error('Error in listing objects: ', error);
+            reject(error);
+        }
+    });
 }
 
 module.exports = {

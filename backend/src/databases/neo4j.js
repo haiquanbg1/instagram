@@ -1,6 +1,6 @@
 var neo4j = require('neo4j-driver');
 
-let driver, session;
+let driver;
 
 (async () => {
   // URI examples: 'neo4j://localhost', 'neo4j+s://xxx.databases.neo4j.io'
@@ -10,13 +10,11 @@ let driver, session;
 
   try {
     driver = neo4j.driver(URI, neo4j.auth.basic(USER, PASSWORD));
-    session = driver.session();
   } catch(err) {
     console.log(`Connection error\n${err}\nCause: ${err.cause}`)
   }
 })();
 
 module.exports = {
-  driver,
-  session
+  driver
 };

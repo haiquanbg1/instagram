@@ -43,14 +43,14 @@ const register = async (req, res) => {
     try {
         await User.create(user);
 
-        // Send Kafka event
-        const event = {
-            type: 'UserCreated',
-            userName: user.userName,
-        };
+        // // Send Kafka event
+        // const event = {
+        //     type: 'UserCreated',
+        //     userName: user.userName,
+        // };
         // await kafkaService.sendMessage("user_changes", event);
 
-        await neo4jService.createPerson(user.userName);
+        await neo4jService.create("User", user.userName);
 
         return successResponse(res, 201, "Register successfully!", {
             name: user.firstName + " " + user.lastName,

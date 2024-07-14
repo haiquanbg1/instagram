@@ -1,5 +1,5 @@
 const { Post } = require("../models/index");
-const { getLikesCount } = require("./neo4jService");
+const { getLikesCount } = require("./neo4jPostService");
 const redis = require("../databases/redis");
 
 const findAll = async (limit, offset) => {

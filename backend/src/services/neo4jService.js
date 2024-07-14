@@ -1,3 +1,4 @@
+const { int } = require('neo4j-driver');
 const { driver } = require('../databases/neo4j');
 
 const neo4jService = {
@@ -33,7 +34,22 @@ const neo4jService = {
     }
   },
 
-  likePost: async (userName, postName) => {
+  userCreatePost: async (userName, postName) => {
+    const session = driver.session();
+    userName = userName.toString();
+    
+    try {
+      const result = await session.run(
+        'MATCH (u:User {name: $userName}), (p:Post {name: $postName}) CREATE (u)-[:CREATE]->(p)',
+        { userName, postName }
+      );
+      return result;
+    } finally {
+      await session.close();
+    }
+  },
+
+  userLikePost: async (userName, postName) => {
     const session = driver.session();
     userName = userName.toString();
     
@@ -48,7 +64,7 @@ const neo4jService = {
     }
   },
 
-  unlikePost: async (userName, postName) => {
+  userUnlikePost: async (userName, postName) => {
     const session = driver.session();
     userName = userName.toString();
     
@@ -71,6 +87,22 @@ const neo4jService = {
         { postName }
       );
       return result.records[0].get('likesCount').toString();
+    } finally {
+      await session.close();
+    }
+  },
+
+  getUserLikePost: async (postName, skip, limit) => {
+    const session = driver.session();
+    try {
+      const result = await session.run(
+        `MATCH (u:User)-[:LIKE]->(p:Post {name: $postName})
+        RETURN u
+        SKIP $skip
+        LIMIT $limit`,
+        { postName, skip: int(skip), limit: int(limit) }
+      );
+      return result.records.map(record => record.get('u').properties.name);
     } finally {
       await session.close();
     }

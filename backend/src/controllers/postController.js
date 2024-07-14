@@ -20,6 +20,7 @@ const create = async (req, res) => {
 
         // create to neo4j
         await neo4jService.create("Post", "post" + post.id);
+        await neo4jService.userCreatePost(req.user.userName, "post" + post.id);
 
         // create bucket
         const bucketName = "post" + post.id;
@@ -85,7 +86,7 @@ const like = async (req, res) => {
     const { postId } = req.body;
     const likeOfPost = `post:${postId}:likes`;
 
-    await neo4jService.likePost(userName,"post" + postId)
+    await neo4jService.userLikePost(userName,"post" + postId)
     .catch((err) => {
         console.log(err);
         return errorResponse(res, 500, "Can't like post!");
@@ -101,7 +102,7 @@ const unlike = async (req, res) => {
     const { postId } = req.body;
     const likeOfPost = `post:${postId}:likes`;
 
-    await neo4jService.unlikePost(userName,"post" + postId)
+    await neo4jService.userUnlikePost(userName,"post" + postId)
     .catch((err) => {
         console.log(err);
         return errorResponse(res, 500, "Can't unlike post!");
@@ -112,9 +113,24 @@ const unlike = async (req, res) => {
     return successResponse(res, 200, "Unlike post successfully!");
 }
 
+const findUserLikePost = async (req, res) => {
+    const { postId, page } = req.body;
+    const limit = 20;
+    const skip = page * limit;
+
+    const users = await neo4jService.getUserLikePost("post" + postId, skip, limit)
+    .catch((err) => {
+        console.log(err);
+        return errorResponse(res, 500, "Can't find user like post!");
+    });
+
+    return successResponse(res, 200, "Find user like post successfully!", users);
+}
+
 module.exports = {
     create,
     findAll,
     like,
-    unlike
+    unlike,
+    findUserLikePost
 }

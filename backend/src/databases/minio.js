@@ -39,10 +39,14 @@ const listObjectsAndUrls = (bucketName) => {
         try {
             const stream = minioClient.listObjectsV2(bucketName, '', true);
     
-            stream.on('data', obj => {
-                // Tạo URL tĩnh
-                const url = `${minioClient.protocol}//${minioClient.host}:${minioClient.port}/${bucketName}/${obj.name}`;
-                images.push(url);
+            stream.on('data', async (obj) => {
+                try {
+                    // Tạo URL đã ký trước cho mỗi file
+                    const url = await minioClient.presignedUrl('GET', bucketName, obj.name, 24*60*60); // URL có hiệu lực trong 24 giờ
+                    images.push(url);
+                  } catch (err) {
+                    console.error('Error generating presigned URL', err);
+                  }
                 // console.log(`File: ${obj.name}, URL: ${url}`);
             });
     

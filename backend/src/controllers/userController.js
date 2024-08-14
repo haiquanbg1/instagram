@@ -32,7 +32,7 @@ const findAll = async (req, res) => {
 }
 
 const findOne = async (req, res) => {
-    const {refreshToken, userName, email} = req.body;
+    const { refreshToken, userName, email } = req.body;
     const whereClause = {};
 
     if (refreshToken) {
@@ -57,24 +57,24 @@ const followUser = async (req, res) => {
     const userFollowed = req.body.userName;
 
     await neo4jUserService.followUser(userFollow, userFollowed)
-    .catch((err) => {
-        console.log(err);
-        return errorResponse(res, 500, "Can't follow user!");
-    })
+        .catch((err) => {
+            console.log(err);
+            return errorResponse(res, 500, "Can't follow user!");
+        })
 
     return successResponse(res, 200, "Follow user successfully!");
 }
 
-const getUserFollow = async (req, res) => {
+const getUserFollowed = async (req, res) => {
     const { userName, page } = req.user;
     const limit = 20;
     const skip = page * limit;
 
-    const users = await neo4jUserService.getUserFollow(userName, skip, limit)
-    .catch((err) => {
-        console.log(err);
-        return errorResponse(res, 500, "Can't get user follow!");
-    })
+    const users = await neo4jUserService.getUserFollowed(userName, skip, limit)
+        .catch((err) => {
+            console.log(err);
+            return errorResponse(res, 500, "Can't get user follow!");
+        })
 
     return successResponse(res, 200, "Find user follow successfully!", users);
 }
@@ -85,10 +85,10 @@ const getUserFollowing = async (req, res) => {
     const skip = page * limit;
 
     const users = await neo4jUserService.getUserFollowing(userName, skip, limit)
-    .catch((err) => {
-        console.log(err);
-        return errorResponse(res, 500, "Can't get user follow!");
-    })
+        .catch((err) => {
+            console.log(err);
+            return errorResponse(res, 500, "Can't get user follow!");
+        })
 
     return successResponse(res, 200, "Find user follow successfully!", users);
 }
@@ -97,6 +97,6 @@ module.exports = {
     findAll,
     findOne,
     followUser,
-    getUserFollow,
+    getUserFollowed,
     getUserFollowing
 }

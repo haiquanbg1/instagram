@@ -20,7 +20,7 @@ const neo4jUserService = {
 
     followUser: async (userFollow, userFollowed) => {
         const session = driver.session();
-        
+
         try {
             const result = await session.run(
                 'MATCH (u1:User {name: $userFollow}), (u2:User {name: $userFollowed}) CREATE (u1)-[:FOLLOW]->(u2)',
@@ -58,7 +58,7 @@ const neo4jUserService = {
         }
     },
 
-    getUserFollow: async (userName, skip, limit) => {
+    getUserFollowed: async (userName, skip, limit) => {
         const session = driver.session();
         try {
             const result = await session.run(

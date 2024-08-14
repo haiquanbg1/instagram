@@ -10,6 +10,6 @@ router.post("/", isAuth, upload.array('image', 10), Post.create);
 router.get("/", Post.findAll);
 router.post("/like", isAuth, Post.like);
 router.post("/unlike", isAuth, Post.unlike);
-router.get("/like/user", Post.findUserLikePost);
+router.get("/user-like", Post.findUserLikePost);
 
 module.exports = router;

@@ -1,6 +1,7 @@
 const { Post } = require("../models/index");
 const { getLikesCount } = require("./neo4jPostService");
 const redis = require("../databases/redis");
+const { like } = require("../controllers/postController");
 
 const findAll = async (limit, offset) => {
     return await Post.findAll({
@@ -22,6 +23,14 @@ const update = async (id, updateClause) => {
     })
 }
 
+const remove = async (id) => {
+    return await Post.destroy({
+        where: {
+            id
+        }
+    });
+}
+
 const countLike = async (postId) => {
     const likeOfPost = `post:${postId}:likes`;
 
@@ -33,6 +42,7 @@ const countLike = async (postId) => {
 
     const likesCount = await getLikesCount("post" + postId);
     await redis.set(likeOfPost, likesCount);
+    await redis.expire(likeOfPost, 24 * 60 * 60);
 
     return likesCount;
 }
@@ -41,5 +51,6 @@ module.exports = {
     create,
     update,
     findAll,
-    countLike
+    countLike,
+    remove
 }

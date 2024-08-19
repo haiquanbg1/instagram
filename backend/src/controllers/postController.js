@@ -26,7 +26,7 @@ const create = async (req, res) => {
 
         // create bucket
         const bucketName = "post" + post.id;
-        
+
         for (const file of uploadedFiles) {
             const filePath = file.path;
             const fileName = file.filename;
@@ -57,13 +57,13 @@ const findAll = async (req, res) => {
     const { page } = req.query;
 
     const limit = 5;
-    const offset = page * limit; 
+    const offset = page * limit;
 
     const result = [];
     try {
         const posts = await Post.findAll(limit, offset);
 
-        for (let i=0; i<limit; i++) {
+        for (let i = 0; i < limit; i++) {
             const image = await minio.listObjectsAndUrls("post" + posts[i].id); // image in post
             const likes = await Post.countLike(posts[i].id);
 
@@ -88,11 +88,11 @@ const like = async (req, res) => {
     const { postId } = req.body;
     const likeOfPost = `post:${postId}:likes`;
 
-    await neo4jPostService.userLikePost(userName,"post" + postId)
-    .catch((err) => {
-        console.log(err);
-        return errorResponse(res, 500, "Can't like post!");
-    });
+    await neo4jPostService.userLikePost(userName, "post" + postId)
+        .catch((err) => {
+            console.log(err);
+            return errorResponse(res, 500, "Can't like post!");
+        });
 
     await redis.incr(likeOfPost);
 
@@ -104,11 +104,11 @@ const unlike = async (req, res) => {
     const { postId } = req.body;
     const likeOfPost = `post:${postId}:likes`;
 
-    await neo4jPostService.userUnlikePost(userName,"post" + postId)
-    .catch((err) => {
-        console.log(err);
-        return errorResponse(res, 500, "Can't unlike post!");
-    });
+    await neo4jPostService.userUnlikePost(userName, "post" + postId)
+        .catch((err) => {
+            console.log(err);
+            return errorResponse(res, 500, "Can't unlike post!");
+        });
 
     await redis.decr(likeOfPost);
 
@@ -121,12 +121,27 @@ const findUserLikePost = async (req, res) => {
     const skip = page * limit;
 
     const users = await neo4jUserService.getUserLikePost("post" + postId, skip, limit)
-    .catch((err) => {
-        console.log(err);
-        return errorResponse(res, 500, "Can't find user like post!");
-    });
+        .catch((err) => {
+            console.log(err);
+            return errorResponse(res, 500, "Can't find user like post!");
+        });
 
     return successResponse(res, 200, "Find user like post successfully!", users);
+}
+
+const deletePost = async (req, res) => {
+    const { postId } = req.body;
+    const bucketName = "post" + postId;
+
+    await Post.remove(postId)
+        .catch((err) => {
+            console.log(err);
+            return errorResponse(res, 500, "Can't remove post!");
+        });
+
+    await minio.remove(bucketName);
+
+    return successResponse(res, 200, "Delete post successfully!");
 }
 
 module.exports = {
@@ -134,5 +149,6 @@ module.exports = {
     findAll,
     like,
     unlike,
-    findUserLikePost
+    findUserLikePost,
+    deletePost
 }

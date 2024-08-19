@@ -11,5 +11,6 @@ router.get("/", Post.findAll);
 router.post("/like", isAuth, Post.like);
 router.post("/unlike", isAuth, Post.unlike);
 router.get("/user-like", Post.findUserLikePost);
+router.delete("/delete", isAuth, Post.deletePost);
 
 module.exports = router;
